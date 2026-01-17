@@ -490,16 +490,30 @@ frameborder="1"
 
     </script>
 
-<script>
-    // Hide note on any key press or click
-    document.addEventListener('keydown', function() {
-        document.getElementById('note-text').style.display = 'none';
+    <script>
+    var noteElement = document.getElementById('note-text');
+    var isHidden = false;
+    
+    // Hide note on any key press or click (except 'r')
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'r' || e.key === 'R') {
+            // Show the note again when 'r' is pressed
+            noteElement.style.display = 'block';
+            isHidden = false;
+        } else if (!isHidden) {
+            // Hide on any other key
+            noteElement.style.display = 'none';
+            isHidden = true;
+        }
     });
     
     document.addEventListener('click', function() {
-        document.getElementById('note-text').style.display = 'none';
+        if (!isHidden) {
+            noteElement.style.display = 'none';
+            isHidden = true;
+        }
     });
-</script>    
+    </script>
 
 </body>
 </html>
