@@ -362,6 +362,11 @@ height="1px"
     oncontextmenu="event.preventDefault()" tabindex=1>
     </canvas>
 
+    <div id="note-text" style="position: absolute; left: 20px; top: 20px; background-color: rgba(211, 211, 211, 0.9); padding: 15px; border-radius: 5px; font-family: Arial, sans-serif;">
+    <strong>Note:</strong><br>
+    Press "i" for more info
+    </div>
+
     <div id=html></div>
 
     <div id=crt  class=bottomright >
@@ -484,6 +489,17 @@ frameborder="1"
     }
 
     </script>
+
+<script>
+    // Hide note on any key press or click
+    document.addEventListener('keydown', function() {
+        document.getElementById('note-text').style.display = 'none';
+    });
+    
+    document.addEventListener('click', function() {
+        document.getElementById('note-text').style.display = 'none';
+    });
+</script>    
 
 </body>
 </html>
