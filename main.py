@@ -15,7 +15,7 @@ async def main():
     pygame.init()
     #pygame.mixer.init()
 
-    pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+    pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=1024)
 
 
     WIDTH = 480
@@ -27,13 +27,6 @@ async def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("0rion | Press \"i\" for more info")
 
-    # Load sound once
-    move_sound = None
-    try:
-        move_sound = pygame.mixer.Sound("sounds/move.wav")
-    except:
-        pass
-
     board = chess.Board()
     clock = pygame.time.Clock()
     play_sound = False
@@ -44,6 +37,7 @@ async def main():
     show_info = False
     disable_show_info = False
     disable_switch = False
+    pending_sound = False
     global debug_messages
     debug_messages = []
     
@@ -62,7 +56,7 @@ async def main():
 
     # Load sound
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    move_sound = pygame.mixer.Sound(os.path.join(BASE_DIR, "sounds", "move.wav"))
+    move_sound = pygame.mixer.Sound(os.path.join(BASE_DIR, "sounds", "move.ogg"))
     move_sound.set_volume(1.0)  # Set to full volume
 
     # Load piece images
@@ -860,6 +854,12 @@ async def main():
         while game_running and running:
             clock.tick(60)
 
+            # This fixes the pygbag sound problem putting the
+            # sound in a fresh frame cycle.
+            if pending_sound:
+                move_sound.play()
+                pending_sound = False
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -1033,8 +1033,8 @@ async def main():
                                 disable_show_info = True #Cannot look at info screen after the first move
                                 disable_switch = True #Cannot switch colors after the first move
                                 
-                                play_sound = True
-
+                                move_sound.play()
+                                
                                 computer_thinking = True
                                 computer_move_time = pygame.time.get_ticks() + COMPUTER_DELAY
 
@@ -1054,7 +1054,11 @@ async def main():
             ):
                 move = get_safe_move(board)
                 board.push(move)
-                play_sound = True
+
+                pending_sound = True
+                
+                
+
                 computer_thinking = False
 
             if board.is_game_over() and not game_over and not debug_mode:
@@ -1093,10 +1097,6 @@ async def main():
 
             pygame.display.flip()
 
-            if play_sound:
-                move_sound.set_volume(1.0)  # Ensure full volume
-                move_sound.play()
-                play_sound = False
 
             await asyncio.sleep(0)
 
